@@ -141,34 +141,49 @@ var App = /*#__PURE__*/function () {
     key: "loadData",
     value: function () {
       var _loadData = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var response, jsonData, area, list, regNames, popNumbers, i, population;
+        var responsePopulation, responseEmployment, jsonPopulation, jsonEmployment, area, list, regNames, popNumbers, empNumbers, i, population, employment;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
               return fetch("https://statfin.stat.fi/PxWeb/sq/4e244893-7761-4c4f-8e55-7a8d41d86eff");
             case 2:
-              response = _context.sent;
+              responsePopulation = _context.sent;
               _context.next = 5;
-              return response.json();
+              return fetch("https://statfin.stat.fi/PxWeb/sq/5e288b40-f8c8-4f1e-b3b0-61b86ce5c065");
             case 5:
-              jsonData = _context.sent;
-              area = jsonData.dataset.dimension.Alue.category.label;
+              responseEmployment = _context.sent;
+              _context.next = 8;
+              return responsePopulation.json();
+            case 8:
+              jsonPopulation = _context.sent;
+              _context.next = 11;
+              return responseEmployment.json();
+            case 11:
+              jsonEmployment = _context.sent;
+              area = jsonPopulation.dataset.dimension.Alue.category.label;
               list = [];
               regNames = Object.values(area);
-              popNumbers = jsonData.dataset.value;
+              popNumbers = jsonPopulation.dataset.value;
+              empNumbers = jsonEmployment.dataset.value;
               for (i = 0; i < regNames.length; i++) {
                 population = 0;
+                employment = 0;
                 if (i < popNumbers.length) {
                   population = popNumbers[i];
                 }
+                if (i < empNumbers.length) {
+                  employment = empNumbers[i];
+                }
                 list.push({
                   regionName: regNames[i],
-                  population: population
+                  population: population,
+                  employment: employment,
+                  employmentPercent: population != 0 ? Math.round(employment / population * 100 * 100) / 100 : 0
                 });
               }
               return _context.abrupt("return", list);
-            case 12:
+            case 19:
             case "end":
               return _context.stop();
           }
@@ -195,6 +210,13 @@ var App = /*#__PURE__*/function () {
         var tr = document.createElement("tr");
         tr.appendChild(_this.createCell(element.regionName));
         tr.appendChild(_this.createCell(element.population));
+        tr.appendChild(_this.createCell(element.employment));
+        tr.appendChild(_this.createCell(element.employmentPercent));
+        if (element.employmentPercent > 45) {
+          tr.className = "high-emp-percent";
+        } else if (element.employmentPercent < 25) {
+          tr.className = "low-emp-percent";
+        }
         table.appendChild(tr);
       });
     }
@@ -315,7 +337,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62297" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52410" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

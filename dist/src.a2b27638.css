@@ -34,5 +34,12 @@ tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 
+tr.high-emp-percent {
+  background-color: #abffbd;
+}
+
+tr.low-emp-percent {
+  background-color: #ff9e9e;
+} 
 
 /*# sourceMappingURL=/src.a2b27638.css.map */
